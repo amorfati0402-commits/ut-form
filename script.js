@@ -394,6 +394,8 @@ async function fetchServerDraft(name) {
   return null;
 }
 
+let _serverDraft = null;
+
 async function fetchAndShowDraft() {
   const name = document.getElementById('submitter-name').value.trim();
   const msg = document.getElementById('fetch-draft-msg');
@@ -410,9 +412,23 @@ async function fetchAndShowDraft() {
     return;
   }
   msg.style.display = 'none';
-  localStorage.setItem('ut-draft', JSON.stringify(draft));
-  document.getElementById('draft-banner').style.display = 'flex';
-  if (draft._savedAt) updateLastSavedLabel(new Date(draft._savedAt));
+  _serverDraft = draft;
+  const savedAt = draft._savedAt ? new Date(draft._savedAt).toLocaleString('ko-KR', { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+  document.getElementById('draft-modal-desc').textContent = savedAt ? `${savedAt}에 저장한 내용이 있어요.` : '이전에 저장한 내용이 있어요.';
+  document.getElementById('draft-modal').style.display = 'flex';
+}
+
+function applyServerDraft() {
+  if (!_serverDraft) return;
+  localStorage.setItem('ut-draft', JSON.stringify(_serverDraft));
+  closeDraftModal();
+  restoreFromDraft();
+  if (_serverDraft._savedAt) updateLastSavedLabel(new Date(_serverDraft._savedAt));
+}
+
+function closeDraftModal() {
+  document.getElementById('draft-modal').style.display = 'none';
+  _serverDraft = null;
 }
 
 // 페이지 로드: 임시저장 있으면 배너 표시

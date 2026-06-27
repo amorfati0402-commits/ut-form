@@ -8,12 +8,24 @@
 </head>
 <body>
 
-<!-- 임시저장 배너 -->
+<!-- 임시저장 배너 (로컬 자동감지용) -->
 <div class="draft-banner" id="draft-banner">
   <span>💾 임시저장된 내용이 있어요. 불러올까요?</span>
   <div class="draft-banner-btns">
     <button onclick="applyDraft()">불러오기</button>
     <button class="ghost" onclick="startFresh()">새로 시작</button>
+  </div>
+</div>
+
+<!-- 이어하기 팝업 -->
+<div class="modal-overlay" id="draft-modal" style="display:none;" onclick="closeDraftModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-title">💾 저장된 내용이 있어요</div>
+    <div class="modal-desc" id="draft-modal-desc"></div>
+    <div class="modal-btns">
+      <button class="modal-btn-primary" onclick="applyServerDraft()">이어서 작성하기</button>
+      <button class="modal-btn-ghost" onclick="closeDraftModal()">새로 시작</button>
+    </div>
   </div>
 </div>
 
@@ -29,7 +41,7 @@
   <div class="submitter-wrap">
     <label>✏️ 이름 (닉네임)</label>
     <input type="text" id="submitter-name" placeholder="예: 태경, 지수PM ...">
-    <button type="button" class="fetch-draft-btn" onclick="fetchAndShowDraft()">이전에 저장한 내용 불러오기</button>
+    <button type="button" class="fetch-draft-btn" onclick="fetchAndShowDraft()">이어하기</button>
     <div id="fetch-draft-msg" style="display:none;font-size:12px;color:#888;margin-top:6px;"></div>
   </div>
 
