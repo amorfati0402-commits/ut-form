@@ -2,12 +2,12 @@
 const checkData = {
   q2: { multi: false, items: ['iPhone (iOS)', '안드로이드'] },
   q3: { multi: false, items: ['혼자 살아요 (자취/1인)', '부모님과 함께', '배우자/파트너와 함께', '배우자+자녀와 함께', '룸메이트와 함께'] },
-  q4: { multi: false, items: ['거의 매일', '주 2~3회', '월 2~3회', '거의 안 써요'] },
+  q4: { multi: false, items: ['거의 매일', '주 2~3회', '월 2~3회', '월 1회', '분기 1~2회', '거의 안 써요'] },
   q5: { multi: true,  items: ['중고거래', '동네생활', '동네지도', '알바', '부동산', '기타'] },
   q6: { multi: false, items: ['네, 가입했어요', '아니요 / 이름만 들어봤어요'] },
   q7: { multi: false, items: ['여러 번 있어요', '한두 번 있어요', '없어요'] },
   q8: { multi: false, items: ['CU 등 브랜드 이벤트', '중고거래 정산', '혜택 안내 보고', '지인 추천', '기억 안 남', '기타'] },
-  q9: { multi: true,  items: ['카카오페이', '네이버페이', '삼성/애플페이', '토스', '기타'] },
+  q9: { multi: true,  items: ['카카오페이', '네이버페이', '삼성/애플페이', '토스', '카드만 거의 써요', '기타'] },
   'qb-ask':     { multi: false, items: ['네, 물어봤어요', '아니요, 그냥 결제했어요'] },
   'qb-sticker': { multi: false, items: ['스티커/안내물 있었어요', '없었어요', '못 봤어요'] },
   c1: { multi: false, items: ['됩니다', '안 돼요', '못 찾음'] },
@@ -33,6 +33,17 @@ Object.entries(checkData).forEach(([id, cfg]) => {
     el.appendChild(div);
   });
 });
+
+// Q9 기타 클릭 시 입력창 표시
+const q9El = document.getElementById('q9');
+if (q9El) {
+  q9El.addEventListener('click', function(e) {
+    if (e.target.classList.contains('check-item') && e.target.textContent.trim() === '기타') {
+      document.getElementById('q9-etc-input').style.display =
+        e.target.classList.contains('selected') ? 'block' : 'none';
+    }
+  });
+}
 
 // 아코디언
 function toggleAccordion(btn) {
@@ -105,7 +116,7 @@ function collectFormData() {
       'Q6 당근페이 가입': chk('q6'),
       'Q7 현장결제 경험': chk('q7'),
       'Q8 첫 계기': chk('q8'),
-      'Q9 간편결제': chkArr('q9'),
+      'Q9 간편결제': (() => { const arr = chkArr('q9'); const etc = val('q9-etc'); return arr.includes('기타') && etc ? arr.map(v => v === '기타' ? `기타(${etc})` : v) : arr; })(),
     },
     '상황A': {
       '결제화면 경로': val('a1'),
@@ -154,7 +165,18 @@ function saveTemp(silent) {
   data._savedAt = now.toISOString();
   localStorage.setItem('ut-draft', JSON.stringify(data));
   updateLastSavedLabel(now);
-  if (!silent) showToast('임시저장 완료! 💾');
+  if (!silent) {
+    if (GAS_URL && data.meta.submitter) {
+      fetch(GAS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify(buildSheetsPayload(data, '임시저장')),
+      }).then(() => showToast('💾 임시저장 완료! (다른 기기에서도 불러올 수 있어요)'))
+        .catch(() => showToast('임시저장 완료! 💾'));
+    } else {
+      showToast('임시저장 완료! 💾');
+    }
+  }
 }
 
 function scheduleAutoSave() {
@@ -292,6 +314,7 @@ function buildSheetsPayload(data, status) {
   flat['Status'] = status;
   flat['제출시각'] = new Date().toLocaleString('ko-KR');
   flat['제출자'] = data.meta?.submitter || '';
+  flat['_rawjson'] = JSON.stringify(data);
   const sections = ['STEP0', '상황A', '상황B', '상황C', 'STEP2'];
   sections.forEach(sec => {
     if (!data[sec]) return;
@@ -358,6 +381,27 @@ document.querySelectorAll('textarea, input[type=text]').forEach(el => {
 });
 document.addEventListener('click', e => {
   if (e.target.classList.contains('check-item')) scheduleAutoSave();
+});
+
+// ── 다른 기기에서 임시저장 불러오기 ──────────────────
+async function fetchServerDraft(name) {
+  if (!GAS_URL || !name) return null;
+  try {
+    const res = await fetch(GAS_URL + '?name=' + encodeURIComponent(name));
+    const json = await res.json().catch(() => ({}));
+    if (json.ok && json.rawjson) return JSON.parse(json.rawjson);
+  } catch {}
+  return null;
+}
+
+document.getElementById('submitter-name').addEventListener('blur', async function () {
+  const name = this.value.trim();
+  if (!name || localStorage.getItem('ut-draft')) return;
+  const draft = await fetchServerDraft(name);
+  if (!draft) return;
+  localStorage.setItem('ut-draft', JSON.stringify(draft));
+  document.getElementById('draft-banner').style.display = 'flex';
+  if (draft._savedAt) updateLastSavedLabel(new Date(draft._savedAt));
 });
 
 // 페이지 로드: 임시저장 있으면 배너 표시
