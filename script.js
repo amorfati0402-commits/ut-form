@@ -419,22 +419,37 @@ async function fetchAndShowDraft() {
     msg.textContent = '닉네임을 먼저 입력해주세요.';
     return;
   }
-  if (localStorage.getItem('ut-draft')) {
-    document.getElementById('draft-banner').style.display = 'flex';
-    return;
-  }
   msg.style.display = 'block';
   msg.textContent = '확인 중...';
-  const draft = await fetchServerDraft(name);
-  if (!draft) {
-    msg.textContent = '저장된 내용이 없어요.';
+
+  // 1순위: 서버 조회
+  const serverDraft = await fetchServerDraft(name);
+  if (serverDraft) {
+    msg.style.display = 'none';
+    _serverDraft = serverDraft;
+    const savedAt = serverDraft._savedAt ? new Date(serverDraft._savedAt).toLocaleString('ko-KR', { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+    document.getElementById('draft-modal-desc').textContent = savedAt ? `${savedAt}에 저장한 내용이 있어요.` : '이전에 저장한 내용이 있어요.';
+    document.getElementById('draft-modal').style.display = 'flex';
     return;
   }
-  msg.style.display = 'none';
-  _serverDraft = draft;
-  const savedAt = draft._savedAt ? new Date(draft._savedAt).toLocaleString('ko-KR', { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
-  document.getElementById('draft-modal-desc').textContent = savedAt ? `${savedAt}에 저장한 내용이 있어요.` : '이전에 저장한 내용이 있어요.';
-  document.getElementById('draft-modal').style.display = 'flex';
+
+  // 2순위: 이 기기 로컬 체크 (같은 닉네임인 경우만)
+  const localRaw = localStorage.getItem('ut-draft');
+  if (localRaw) {
+    try {
+      const localDraft = JSON.parse(localRaw);
+      if (localDraft.meta?.submitter === name) {
+        msg.style.display = 'none';
+        _serverDraft = localDraft;
+        const savedAt = localDraft._savedAt ? new Date(localDraft._savedAt).toLocaleString('ko-KR', { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+        document.getElementById('draft-modal-desc').textContent = savedAt ? `${savedAt}에 이 기기에서 저장한 내용이 있어요.` : '이 기기에 저장된 내용이 있어요.';
+        document.getElementById('draft-modal').style.display = 'flex';
+        return;
+      }
+    } catch {}
+  }
+
+  msg.textContent = '저장된 내용이 없어요.';
 }
 
 function applyServerDraft() {
@@ -451,5 +466,4 @@ function closeDraftModal() {
   _serverDraft = null;
 }
 
-// 페이지 로드: 임시저장 있으면 배너 표시
-checkDraft();
+// 페이지 로드 시 자동 배너 없음 - 이름 기반 이어하기 버튼으로 통일
