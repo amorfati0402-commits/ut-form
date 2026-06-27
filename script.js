@@ -394,15 +394,26 @@ async function fetchServerDraft(name) {
   return null;
 }
 
-document.getElementById('submitter-name').addEventListener('blur', async function () {
-  const name = this.value.trim();
-  if (!name || localStorage.getItem('ut-draft')) return;
+async function fetchAndShowDraft() {
+  const name = document.getElementById('submitter-name').value.trim();
+  const msg = document.getElementById('fetch-draft-msg');
+  if (!name) {
+    msg.style.display = 'block';
+    msg.textContent = '닉네임을 먼저 입력해주세요.';
+    return;
+  }
+  msg.style.display = 'block';
+  msg.textContent = '확인 중...';
   const draft = await fetchServerDraft(name);
-  if (!draft) return;
+  if (!draft) {
+    msg.textContent = '저장된 내용이 없어요.';
+    return;
+  }
+  msg.style.display = 'none';
   localStorage.setItem('ut-draft', JSON.stringify(draft));
   document.getElementById('draft-banner').style.display = 'flex';
   if (draft._savedAt) updateLastSavedLabel(new Date(draft._savedAt));
-});
+}
 
 // 페이지 로드: 임시저장 있으면 배너 표시
 checkDraft();
