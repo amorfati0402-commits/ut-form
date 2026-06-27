@@ -567,10 +567,32 @@ textarea.tall { min-height: 120px; }
 }
 
 @media (max-width: 480px) {
-  .wrap { padding: 24px 16px 80px; }
+  .wrap { padding: 24px 16px 90px; }
   .header h1 { font-size: 22px; }
   .check-group { gap: 6px; }
-  .float-wrap { bottom: 16px; right: 16px; }
+  .float-wrap {
+    bottom: 0;
+    right: 0;
+    left: 0;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px 16px;
+    background: rgba(255,255,255,0.96);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid #eee;
+    box-shadow: 0 -2px 12px rgba(0,0,0,0.06);
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+  }
+  .float-toast {
+    flex: 1;
+    text-align: left;
+  }
+  .float-save-btn {
+    width: 100%;
+    padding: 14px;
+    font-size: 15px;
+    border-radius: 12px;
+  }
 }
 
 @media print {
