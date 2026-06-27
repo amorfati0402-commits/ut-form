@@ -284,7 +284,7 @@ function restoreFromDraft() {
 //      실행 계정: 나 / 액세스: 모든 사용자
 //   4. 아래 GAS_URL에 발급된 URL 붙여넣기
 
-const GAS_URL = ''; // ← Apps Script URL 붙여넣기
+const GAS_URL = 'https://script.google.com/macros/s/AKfycby0UkKOLJvutaUE40XsYa1oaakgK8cUvvalKM0I6TKeUMuguL6eNJ4k0YXfSKhwcAhY/exec'; // ← Apps Script URL 붙여넣기
 
 // 시트 전송용 flat 구조 생성
 function buildSheetsPayload(data, status) {
