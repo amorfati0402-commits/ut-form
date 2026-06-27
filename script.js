@@ -171,8 +171,11 @@ function saveTemp(silent) {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify(buildSheetsPayload(data, '임시저장')),
-      }).then(() => showToast('💾 임시저장 완료! (다른 기기에서도 불러올 수 있어요)'))
-        .catch(() => showToast('임시저장 완료! 💾'));
+      }).then(r => r.json()).then(j => {
+        showToast(j.ok ? '💾 임시저장 완료! (다른 기기에서도 불러올 수 있어요)' : '💾 임시저장 완료 (로컬)');
+      }).catch(() => showToast('임시저장 완료! 💾'));
+    } else if (!data.meta.submitter) {
+      showToast('💾 로컬 저장됨 (이름 입력 시 서버에도 저장돼요)');
     } else {
       showToast('임시저장 완료! 💾');
     }
@@ -253,7 +256,19 @@ function restoreFromDraft() {
     setChk('q2', s0['Q2 폰']); setChk('q3', s0['Q3 주거']);
     setChk('q4', s0['Q4 당근 빈도']); setChk('q5', s0['Q5 당근 기능']);
     setChk('q6', s0['Q6 당근페이 가입']); setChk('q7', s0['Q7 현장결제 경험']);
-    setChk('q8', s0['Q8 첫 계기']); setChk('q9', s0['Q9 간편결제']);
+    setChk('q8', s0['Q8 첫 계기']);
+    // Q9 기타(XX) 형태 처리
+    const q9raw = s0['Q9 간편결제'] || [];
+    const q9arr = Array.isArray(q9raw) ? q9raw : q9raw.split(', ');
+    const q9Etc = q9arr.find(v => v.startsWith('기타('));
+    const q9Normalized = q9arr.map(v => v.startsWith('기타(') ? '기타' : v);
+    setChk('q9', q9Normalized);
+    if (q9Etc) {
+      const etcText = q9Etc.replace(/^기타\(/, '').replace(/\)$/, '');
+      const etcInput = document.getElementById('q9-etc');
+      if (etcInput) etcInput.value = etcText;
+      document.getElementById('q9-etc-input').style.display = 'block';
+    }
     const sA = d['상황A'] || {};
     setVal('a1', sA['결제화면 경로']); setVal('a2', sA['막혔던 지점']);
     const sB = d['상황B'] || {};
@@ -404,6 +419,10 @@ async function fetchAndShowDraft() {
     msg.textContent = '닉네임을 먼저 입력해주세요.';
     return;
   }
+  if (localStorage.getItem('ut-draft')) {
+    document.getElementById('draft-banner').style.display = 'flex';
+    return;
+  }
   msg.style.display = 'block';
   msg.textContent = '확인 중...';
   const draft = await fetchServerDraft(name);
@@ -422,6 +441,7 @@ function applyServerDraft() {
   if (!_serverDraft) return;
   localStorage.setItem('ut-draft', JSON.stringify(_serverDraft));
   closeDraftModal();
+  document.getElementById('draft-banner').style.display = 'none';
   restoreFromDraft();
   if (_serverDraft._savedAt) updateLastSavedLabel(new Date(_serverDraft._savedAt));
 }
