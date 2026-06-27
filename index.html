@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>당근페이 현장결제 UT</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- 임시저장 배너 -->
+<div class="draft-banner" id="draft-banner">
+  <span>💾 임시저장된 내용이 있어요. 불러올까요?</span>
+  <div class="draft-banner-btns">
+    <button onclick="applyDraft()">불러오기</button>
+    <button class="ghost" onclick="startFresh()">새로 시작</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- 헤더 -->
+  <div class="header">
+    <h1>당근페이 현장결제 UT</h1>
+    <p>강태경 작성 · PM 지인 대상 · 소요시간 약 30~40분 (실결제 포함)</p>
+  </div>
+
+  <!-- 제출자 이름 -->
+  <div class="submitter-wrap">
+    <label>✏️ 이름 (닉네임)</label>
+    <input type="text" id="submitter-name" placeholder="예: 태경, 지수PM ...">
+  </div>
+
+  <!-- 배경 -->
+  <div class="bg-box">
+    <div class="bg-title">이게 왜 필요한 UT인가요?</div>
+    <p>당근페이는 여태까지 CU 같은 프랜차이즈 가맹점 확대 위주로 전략을 취해왔어요. 이제 <strong>동네 골목 기반으로 빠르게 확장</strong>하려 하고 있는데, 막상 직접 써보면 어디서 막히는지가 너무 궁금한 상황이에요.</p>
+    <div class="purpose">
+      <div>1️⃣ 직접 써보면서 — 어디가 불편한지 (개선점)</div>
+      <div>2️⃣ PM 시각으로 — 동네 확장 전략 힌트 (과제)</div>
+    </div>
+    <div class="notice-list" style="margin-top:16px;">
+      <div>앞부분(시나리오)은 그냥 평소 사용자처럼 해주세요. 분석은 뒤에 따로 여쭤볼게요!</div>
+      <div>막히는 지점은 그 순간 바로 메모해주세요 — 그게 제일 중요한 데이터예요</div>
+      <div>가능하시면 화면 녹화 부탁드려요! (설정 > 화면 녹화)</div>
+    </div>
+  </div>
+
+  <!-- STEP 0: 사전 질문 -->
+  <div class="section">
+    <div class="section-header">
+      <span class="step-badge">STEP 0</span>
+      <span class="section-title">시작 전 짧은 질문</span>
+    </div>
+
+    <div class="q-card">
+      <div class="q-label">기본 정보</div>
+      <div class="q-text">Q1. 사시는 동네가 어디세요? (동 단위)</div>
+      <input type="text" id="q1" placeholder="예: 신림동, 마포동">
+    </div>
+
+    <div class="q-card">
+      <div class="q-text">Q2. 폰 기종은요?</div>
+      <div class="check-group" id="q2"></div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-text">Q3. 주거 형태가 어떻게 되세요?</div>
+      <div class="check-group" id="q3"></div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-label">당근 사용 현황</div>
+      <div class="q-text">Q4. 당근마켓 얼마나 자주 쓰세요?</div>
+      <div class="check-group" id="q4"></div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-text">Q5. 당근마켓에서 주로 뭘 쓰세요? (복수 선택)</div>
+      <div class="check-group" id="q5"></div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-label">당근페이 현황</div>
+      <div class="q-text">Q6. 당근페이 가입하셨나요?</div>
+      <div class="check-group" id="q6"></div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-text">Q7. 당근페이로 오프라인 현장결제 해보신 적 있나요?</div>
+      <div class="q-sub">편의점·음식점 등 동네 가게에서 QR·바코드로 결제하는 것</div>
+      <div class="check-group" id="q7"></div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-text">Q8. 처음 당근페이를 써본 계기가 뭐였나요?</div>
+      <div class="check-group" id="q8"></div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-text">Q9. 평소 주로 쓰시는 간편결제는요?</div>
+      <div class="check-group" id="q9"></div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- STEP 1: 시나리오 -->
+  <div class="section">
+    <div class="section-header">
+      <span class="step-badge">STEP 1</span>
+      <span class="section-title">시나리오 3개 직접 해보기</span>
+    </div>
+    <p style="font-size:13px;color:#888;margin-bottom:20px;">각 상황에 몰입해서 진짜 그 상황이라 생각하고 행동해주세요. 행동하면서 바로바로 메모해주세요 :)</p>
+
+    <!-- 상황 A -->
+    <div class="scenario">
+      <span class="scenario-badge">상황 A</span>
+      <span class="seat-tag">지금 자리에서 해주셔도 돼요</span>
+      <div class="scenario-title">동네 카페에서, 평소처럼</div>
+      <div class="scenario-desc">지금 동네 카페에 있어요. 커피를 시키고 계산하려고 합니다. <strong>당근페이로 결제 화면까지</strong> 가보세요.<br>아직 혜택 같은 건 모르는 상태, 그냥 '당근페이로 내볼까?' 하는 상황이에요.</div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-text">📝 결제 화면까지 가는 길, 어떤 순서로 움직였나요?</div>
+      <div class="q-sub">예: 홈 → 더보기 → ...</div>
+      <textarea id="a1" placeholder="탭 경로를 순서대로 적어주세요"></textarea>
+    </div>
+
+    <div class="q-card">
+      <div class="q-text">📝 어디서 멈칫하거나 헤맸나요?</div>
+      <textarea id="a2" placeholder="막혔던 지점과 그 순간 느낌을 적어주세요"></textarea>
+    </div>
+
+    <hr class="divider">
+
+    <!-- 상황 B: 단골 가게 밀도 확인 -->
+    <div class="scenario">
+      <span class="scenario-badge">상황 B</span>
+      <span class="seat-tag">지금 자리에서 해주셔도 돼요</span>
+      <div class="scenario-title">내 단골 가게는 될까?</div>
+      <div class="scenario-desc">평소 자주 가는 단골 가게 3곳을 떠올려보세요. (카페, 식당, 미용실 등 뭐든)<br><strong>각각 당근페이 결제가 되는지 앱에서 직접 확인해보세요.</strong></div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-text">📝 먼저 — '단골'의 기준은 뭔가요?</div>
+      <div class="q-sub">얼마나 자주 가야, 또는 어떤 가게여야 '단골'이라고 느끼시는지 편하게 적어주세요</div>
+      <textarea id="b-criteria" placeholder="예: 주 1회 이상 가는 곳 / 사장님이 나를 알아보는 곳 등"></textarea>
+    </div>
+
+    <div class="q-card">
+      <div class="q-text">📝 단골 가게 3곳과 확인 결과를 적어주세요</div>
+      <table class="record-table">
+        <thead>
+          <tr>
+            <th style="width:50%">단골 가게 (업종)</th>
+            <th style="width:50%">당근페이 되나요?</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><textarea id="b-shop1" placeholder="예: 자주 가는 카페"></textarea></td>
+            <td>
+              <div class="check-group" id="c1" style="flex-direction:column;gap:4px;"></div>
+            </td>
+          </tr>
+          <tr>
+            <td><textarea id="b-shop2" placeholder="예: 단골 식당"></textarea></td>
+            <td>
+              <div class="check-group" id="c2" style="flex-direction:column;gap:4px;"></div>
+            </td>
+          </tr>
+          <tr>
+            <td><textarea id="b-shop3" placeholder="예: 동네 마트"></textarea></td>
+            <td>
+              <div class="check-group" id="c3" style="flex-direction:column;gap:4px;"></div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="q-card">
+      <div class="q-text">📝 확인 전엔 단골 중 몇 곳이나 될 거라 생각하셨어요? 실제 결과와 달랐나요?</div>
+      <textarea id="b-expectation" placeholder="예상과 실제 차이를 솔직하게 적어주세요"></textarea>
+    </div>
+
+    <div class="q-card">
+      <div class="q-text">📝 단골 가게 대부분이 된다면, 결제 습관이 바뀔 것 같으세요?</div>
+      <textarea id="b-habit" placeholder="바뀔 것 같다 / 아닐 것 같다 + 이유"></textarea>
+    </div>
+
+    <!-- 상황 B 완료 후 아코디언 -->
+    <div class="accordion-wrap">
+      <button class="accordion-btn" onclick="toggleAccordion(this)">🔓 B를 완료하고 열어주세요!</button>
+      <div class="accordion-body">
+        <div class="q-text" style="margin-bottom:12px;">혹시 내비게이션 &gt; 동네지도에서 가맹점을 찾으셨을까요?</div>
+        <div class="check-group" id="nav-yn" style="margin-bottom:16px;"></div>
+        <div id="nav-yes-content" style="display:none;">
+          <div class="nav-hint">💡 동네지도는 '당근 가맹점'이에요. 당근페이 가맹점은 더보기 &gt; 당근페이 &gt; 결제 &gt; 결제가능가맹점에서 찾을 수 있습니다.</div>
+          <textarea id="nav-yes-q1" placeholder="가맹점을 찾은 과정을 자세히 알려주실 수 있나요?" style="margin-bottom:10px;"></textarea>
+          <textarea id="nav-yes-q2" placeholder="어떤 부분이 직관적으로 '문제다!' 싶으셨나요?"></textarea>
+        </div>
+        <div id="nav-no-content" style="display:none;">
+          <textarea id="nav-no-q1" placeholder="가맹점을 찾은 과정을 자세히 알려주실 수 있나요?" style="margin-bottom:10px;"></textarea>
+          <textarea id="nav-no-q2" placeholder="어떤 부분이 직관적으로 '문제다!' 싶으셨나요?"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- 상황 C: 주변 가맹점 찾기 + 실결제 -->
+    <div class="scenario">
+      <span class="scenario-badge">상황 C</span>
+      <span class="seat-tag out">시간 되실 때 결제해 주시겠어요?</span>
+      <div class="scenario-title">이번엔 진짜 근처 가맹점에서 결제를!</div>
+      <div class="scenario-desc">
+        친구가 알려줬어요. <strong>"당근페이로 결제하면 10%를 그대로 돌려준대!"</strong><br><br>
+        먼저 <strong>앱에서 내 주변 당근페이 가맹점을 직접 찾아보세요.</strong> (단골 아니어도 괜찮아요!) 그리고 찾은 가맹점 중 한 곳에 직접 가서 <strong>실제로 결제까지</strong> 해주세요!
+      </div>
+      <div class="scenario-note">☕ 결제 금액(만원 내)은 제가 따로 보내드릴게요!</div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-label">실결제</div>
+      <div class="q-text">📝 어떤 가게에서 결제하셨나요?</div>
+      <input type="text" id="c-store-name" placeholder="가게명 (예: 홍대 OO카페)" style="margin-bottom:8px;">
+      <input type="text" id="c-store-location" placeholder="지역 (예: 마포구 서교동)">
+    </div>
+
+    <div class="q-card">
+      <div class="q-text">📝 어떻게 결제하셨나요?</div>
+      <div class="check-group" id="qc-pay-method"></div>
+      <div id="pay-fail-input" style="display:none;margin-top:10px;">
+        <textarea id="c-pay-fail" placeholder="실패라면 이유는 뭐였나요?"></textarea>
+      </div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-text">📝 혹시 사장님/점원에게 당근페이 결제 가능한지 물어보셨나요?</div>
+      <div class="check-group" id="qb-ask"></div>
+      <div class="q-sub" style="margin-top:10px;">물어보셨다면 — 실제로 뭐라고 말 꺼내셨나요? 점원 반응도 같이 적어주세요</div>
+      <textarea id="c-staff" placeholder="예: '여기 당근페이 되나요?' 라고 물었더니 ... / 그냥 바로 QR 내밀었어요 등"></textarea>
+    </div>
+
+    <div class="q-card">
+      <div class="q-text">📝 가게에 당근페이 관련 스티커나 안내물이 있었나요?</div>
+      <div class="check-group" id="qb-sticker"></div>
+      <textarea id="c-sticker-detail" placeholder="있었다면 어디에 있었나요? 실제 결제해보시니 인사이트가 있으신가요?" style="margin-top:10px;"></textarea>
+    </div>
+
+    <div class="q-card">
+      <div class="q-text">📝 결제하면서 가장 어려웠던 / 어색했던 순간은?</div>
+      <textarea id="c-difficult" placeholder="솔직하게 적어주세요"></textarea>
+    </div>
+
+    <div class="q-card">
+      <div class="q-text">📝 카카오·네이버페이로 낼 때랑 비교하면 뭐가 달랐나요?</div>
+      <textarea id="c-comparison" placeholder="더 번거로웠던 점, 달랐던 점 등"></textarea>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- STEP 2: PM 인터뷰 -->
+  <div class="section">
+    <div class="section-header">
+      <span class="step-badge">STEP 2</span>
+      <span class="section-title">이제 PM으로서 마음껏 뜯어봐 주세요 😄</span>
+    </div>
+
+    <!-- 개선점 -->
+    <div class="pm-section">
+      <div class="pm-category">① 개선점 — 직접 써보니</div>
+
+      <div class="pm-q">
+        <div class="pm-q-text">세 상황 통틀어, 가장 크게 막혔던 지점 딱 하나만 꼽는다면요?</div>
+        <textarea id="s2-biggest" class="tall" placeholder=""></textarea>
+      </div>
+
+      <div class="pm-q">
+        <div class="pm-q-text">'가맹점 찾기(어디서 되는지)'와 '결제 화면 찾기' 중, 어느 쪽이 더 심각한 문제인 것 같으세요?</div>
+        <textarea id="s2-priority" placeholder=""></textarea>
+      </div>
+
+      <div class="pm-q">
+        <div class="pm-q-text">딱 하나만 고칠 수 있다면 뭘 바꾸시겠어요?</div>
+        <textarea id="s2-fix" placeholder=""></textarea>
+      </div>
+    </div>
+
+    <!-- 전략 -->
+    <div class="pm-section">
+      <div class="pm-category">② 전략 — 동네 골목 확장을 한다면</div>
+
+      <div class="strategy-bg">
+        <p><strong>당근에서는 동네에서 빠르게 침투할 수 있는 파일럿 전략을 과제로 줬어요!</strong></p>
+        <p style="margin-top:10px;">당근은 현장결제를 도입한 지 1년 됐고, 지금까진 CU 같은 <strong>프랜차이즈 위주</strong>로 진행해왔어요. 이제 동네 소상공인 현장결제는 처음 시도하는 건데, 다른 페이사와 결이 달라요 — 단순히 결제 수단을 하나 더 까는 게 아니라, <strong>동네 단골 관계 위에 결제를 얹으려 해요.</strong></p>
+        <p style="margin-top:10px;">그래서 저는 6개월 파일럿을 두 단계로 나눠 실험해보려 해요.</p>
+        <p style="margin-top:8px;">먼저 <strong>~3개월</strong> — 단골 가게가 많은 골목을 우선순위로 골라, "여기선 다 된다"는 밀도가 어느 정도여야 사용자가 반응하고 실제 결제로 이어지는지 봅니다.</p>
+        <p style="margin-top:8px;">나머지 <strong>~3개월</strong> — 어떤 상권이, 어떤 연령대가, 어떤 혜택이 맞는지 PMF를 파악해서, 시장에 가장 빠르게 침투할 수 있는 방향으로 확대합니다.</p>
+      </div>
+
+      <div class="pm-q">
+        <div class="pm-q-text">이 흐름, 어디서 공격받을 것 같으세요? "그 부분 약하지 않아?" 싶은 데 편하게 찌르세요 :)</div>
+        <textarea id="s2-attack" class="tall" placeholder=""></textarea>
+      </div>
+
+      <div class="pm-q">
+        <div class="pm-q-text">'단골 빽빽한 골목'을 저는 데이터로 찾겠지만, 감으로는 — 어떤 골목이 '새 결제수단 깔면 제일 빨리 퍼지겠다' 싶으세요? 그 골목의 어떤 특징 때문에요?</div>
+        <textarea id="s2-alley" class="tall" placeholder=""></textarea>
+      </div>
+    </div>
+
+    <!-- 자유 -->
+    <div class="pm-section">
+      <div class="pm-category">③ 자유</div>
+      <div class="pm-q">
+        <div class="pm-q-text">좋은 아이디어 있으시면 뭐든 편하게요!</div>
+        <textarea id="s2-free" class="tall" placeholder=""></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- 버튼 영역 -->
+  <div class="last-saved-label" id="last-saved-label">마지막 임시저장: <span id="last-saved-time"></span></div>
+  <button class="submit-btn" onclick="submitForm()">🚀 응답 제출하기</button>
+  <div class="submit-msg" id="submit-msg"></div>
+  <button class="save-btn" onclick="savePrint()" style="margin-top:10px;">📄 인쇄 / PDF 저장</button>
+  <div class="save-msg" id="save-msg">Ctrl+P (또는 CMD+P)로 PDF 저장도 가능해요!</div>
+
+</div>
+
+<!-- 플로팅 임시저장 -->
+<div class="float-wrap">
+  <div class="float-toast" id="float-toast"></div>
+  <button class="float-save-btn" onclick="saveTemp()">💾 임시저장</button>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
