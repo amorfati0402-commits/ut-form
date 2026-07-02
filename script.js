@@ -467,3 +467,29 @@ function closeDraftModal() {
 }
 
 // 페이지 로드 시 자동 배너 없음 - 이름 기반 이어하기 버튼으로 통일
+
+// ── 방문 추적 ─────────────────────────────────────────
+const _visitStart = Date.now();
+
+function sendVisitLog(status, extra = {}) {
+  if (!GAS_URL) return;
+  const payload = {
+    'Status': status,
+    '제출시각': new Date().toLocaleString('ko-KR'),
+    '제출자': document.getElementById('submitter-name')?.value.trim() || '(미입력)',
+    ...extra,
+  };
+  const blob = new Blob([JSON.stringify(payload)], { type: 'text/plain' });
+  navigator.sendBeacon(GAS_URL, blob);
+}
+
+window.addEventListener('load', () => {
+  sendVisitLog('방문');
+});
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') {
+    const sec = Math.round((Date.now() - _visitStart) / 1000);
+    sendVisitLog('이탈', { '체류시간': `${Math.floor(sec / 60)}분 ${sec % 60}초` });
+  }
+});
